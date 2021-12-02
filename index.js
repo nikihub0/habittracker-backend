@@ -66,7 +66,18 @@ app.get("/bhabits/:id", (req, res) => {
     .then((err) => console.log(err));
 });
 
-app.post("/users", (req, res) => {
+app.post("/users/login", async (req, res) => {
+  const { email, password } = req.body;
+  const foundUser = await pool.query("select * from users where email=$1", [
+    email,
+  ]);
+  if (foundUser.rows[0] != undefined) {
+    res.send(foundUser.rows[0]);
+  } else {
+    res.send({ error: "user not found or password incorrect" });
+  }
+});
+app.post("/users/registration", (req, res) => {
   const { email, password } = req.body;
   pool
     .query("insert into users (email, password) values ($1, $2)", [
@@ -76,7 +87,6 @@ app.post("/users", (req, res) => {
     .then(res.send("success"))
     .catch((err) => console.log(err));
 });
-
 app.put("/users/:id", (req, res) => {
   const { id } = req.params;
   const { email, password } = req.body;
