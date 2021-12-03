@@ -77,15 +77,24 @@ app.post("/users/login", async (req, res) => {
     res.send({ error: "user not found or password incorrect" });
   }
 });
-app.post("/users/registration", (req, res) => {
+app.post("/users/registration", async (req, res) => {
   const { email, password } = req.body;
-  pool
-    .query("insert into users (email, password) values ($1, $2)", [
-      email,
-      password,
-    ])
-    .then(res.send("success"))
-    .catch((err) => console.log(err));
+  const insertUser = await pool.query(
+    "insert into users (email, password) values ($1, $2)",
+    [email, password]
+  );
+  const foundUser = await pool.query("select * from users where email=$1", [
+    email,
+  ]);
+  if (!insertUser) {
+    res.send({ error: "ging nich" });
+  } else {
+    if (foundUser.rows[0] != undefined) {
+      res.send(foundUser.rows[0]);
+    } else {
+      res.send({ error: "user not found or password incorrect" });
+    }
+  }
 });
 app.put("/users/:id", (req, res) => {
   const { id } = req.params;
