@@ -117,6 +117,21 @@ app.delete("/users/:id", (req, res) => {
     .catch((e) => console.log(e));
 });
 
+app.get("/motivation", (req, res) => {
+  pool
+    .query("SELECT * FROM motivation;")
+    .then((result) => res.json(result.rows))
+    .then((err) => console.log(err));
+});
+
+app.get("/motivation/:id", (req, res) => {
+  const { id } = req.params;
+  pool
+    .query("SELECT * FROM motivation WHERE id=$1", [id])
+    .then((result) => res.json(result.rows))
+    .then((err) => console.log(err));
+});
+
 app.listen(port, () => {
   console.log(`app listening at http://localhost:${port}`);
 });
